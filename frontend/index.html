@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Frontend Microservice</title>
+</head>
+<body style="font-family: Arial;">
+  <h1>Frontend Running on Kubernetes!</h1>
+  <p>API Response:</p>
+  <div id="api"></div>
+
+  <script>
+    // Fetch from API via Ingress
+    fetch("//api.philip-portfolio.com/")
+      .then(r => r.json())
+      .then(d => document.getElementById("api").innerText = d.message)
+      .catch(e => console.error(e));
+  </script>
+</body>
+</html>
+

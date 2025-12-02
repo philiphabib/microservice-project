@@ -1,0 +1,18 @@
+ingress:
+  enabled: true
+  className: nginx
+
+domains:
+  frontend: frontend.philip-portfolio.com
+  api: api.philip-portfolio.com
+
+frontend:
+  image: philiphabib/frontend-microservice:latest   # <-- your real image
+  port: 80
+  replicas: 1
+
+api:
+  image: philiphabib/api-microservice:latest        # <-- your real image
+  port: 8000
+  replicas: 1
+    
