@@ -74,13 +74,13 @@ jobs:
       # -----------------------------
       - name: Deploy via Helm on EC2
         run: |
-          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << 'EOF'
+          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 TAG=${TAG} << EOF
           set -e
           cd ~/microservice-project
           git fetch origin
           git reset --hard origin/main
 
           helm upgrade --install microservices ./microservices-chart \
-            --set api.tag=${TAG} \
-            --set frontend.tag=${TAG}
+            --set api.tag=$TAG \
+            --set frontend.tag=$TAG
           EOF
