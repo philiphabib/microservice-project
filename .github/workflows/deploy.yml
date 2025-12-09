@@ -26,22 +26,22 @@ jobs:
       # -----------------------------
       - name: Build API Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api:latest ./api
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest ./api
 
       - name: Push API Image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest
 
       # -----------------------------
       # Build & Push Frontend Image
       # -----------------------------
       - name: Build Frontend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest ./frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest ./frontend
 
       - name: Push Frontend Image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest
 
       # -----------------------------
       # Set up SSH key to EC2
