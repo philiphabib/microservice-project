@@ -9,8 +9,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # -----------------------------
+      # Checkout Code
+      # -----------------------------
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      # -----------------------------
+      # Generate unique tag per commit
+      # -----------------------------
+      - name: Set Image Tag
+        id: vars
+        run: echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
 
       # -----------------------------
       # Docker Login
@@ -26,29 +36,32 @@ jobs:
       # -----------------------------
       - name: Build API Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest ./api
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG} ./api
 
       - name: Push API Image
-        run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest
+      run: |
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG}
 
       # -----------------------------
       # Build & Push Frontend Image
       # -----------------------------
       - name: Build Frontend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest ./frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG} ./frontend
 
       - name: Push Frontend Image
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG}
 
       # -----------------------------
-      # Set up SSH key to EC2
+      # Install SSH client
       # -----------------------------
       - name: Install SSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
 
+      # -----------------------------
+      # Configure SSH access to EC2
+      # -----------------------------
       - name: Set up SSH key
         run: |
           mkdir -p ~/.ssh
@@ -57,15 +70,18 @@ jobs:
           ssh-keyscan -H 34.226.99.222 >> ~/.ssh/known_hosts
 
       # -----------------------------
-      # SSH into EC2 and Deploy via Helm
+      # Deploy to Kubernetes via Helm on EC2
       # -----------------------------
       - name: Deploy to EC2 via Helm
         run: |
-          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << 'EOF'
+          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << EOF
+            set -e
             cd ~/microservice-project
             git fetch origin
             git reset --hard origin/main
 
-            # Update Helm release
-            helm upgrade --install microservices ./microservices-chart
+            # Update Helm with the new image tags
+            helm upgrade --install microservices ./microservices-chart \
+              --set api.image.tag=${TAG} \
+              --set frontend.image.tag=${TAG}
           EOF
