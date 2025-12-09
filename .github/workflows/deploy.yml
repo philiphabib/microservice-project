@@ -81,6 +81,7 @@ jobs:
             git reset --hard origin/main
 
             # Apply new images with tags
-            helm upgrade --install microservices ./microservices-chart \
-              -f values.yaml
+            helm upgrade --install microservices . -f values.yaml \
+              --set api.tag=$TAG \
+              --set frontend.tag=$TAG
           EOF
