@@ -82,6 +82,5 @@ jobs:
 
             # Apply new images with tags
             helm upgrade --install microservices ./microservices-chart \
-              --set api.tag=$TAG \
-              --set frontend.tag=$TAG
+              -f values.yaml
           EOF
