@@ -5,6 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
+
   build_and_push:
     name: Build & Push Docker Images
     runs-on: ubuntu-latest
@@ -23,31 +24,33 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # -----------------------
-      # Build Frontend Image
+      # Build & Push Frontend
       # -----------------------
       - name: Build Frontend Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest ./frontend
 
-      # Push Frontend Image
       - name: Push Frontend Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
 
       # -----------------------
-      # Build API Image
+      # Build & Push API
       # -----------------------
       - name: Build API Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api:latest ./api
 
-      # Push API Image
       - name: Push API Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
 
+
+  # -------------------------------------------------------
+  # DEPLOYMENT JOB
+  # -------------------------------------------------------
   deploy:
-    name: Deploy to Kubernetes
+    name: Deploy to Kubernetes on EC2
     needs: build_and_push
     runs-on: ubuntu-latest
 
@@ -55,20 +58,24 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # -----------------------
-      # SSH into EC2 and Deploy
-      # -----------------------
-      - name: SSH and Apply Helm Upgrade
+      - name: SSH into EC2 & Deploy with Helm
         uses: appleboy/ssh-action@v1.1.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd microservices-chart
-            helm upgrade --install micro . \
-              --set frontend.image=${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest \
-              --set api.image=${{ secrets.DOCKERHUB_USERNAME }}/api:latest
+            cd ~/microservice-project/microservices-chart
 
+            echo ">>> Running Helm Deployment..."
+
+            helm upgrade --install microservices . \
+              --set frontend.image=${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest \
+              --set api.image=${{ secrets.DOCKERHUB_USERNAME }}/api:latest \
+              --atomic --timeout 300s
+
+            echo ">>> Waiting for Deployment Rollout..."
             kubectl rollout status deployment/frontend-deployment
             kubectl rollout status deployment/api-deployment
+
+            echo ">>> Deployment Completed Successfully!"
