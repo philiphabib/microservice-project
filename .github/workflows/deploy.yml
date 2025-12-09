@@ -24,7 +24,7 @@ jobs:
 
       - name: Deploy to EC2
         run: |
-          ssh -i ~/.ssh/id_rsa ubuntu@34.226.99.222 << 'EOF'
+          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << 'EOF'
             cd ~/microservice-project
             git fetch origin
             git reset --hard origin/main
