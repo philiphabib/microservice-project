@@ -10,9 +10,13 @@ frontend:
   image: philiphabib/frontend-microservice:latest   # <-- your real image
   port: 80
   replicas: 1
+  tag: "latest"
+  pullPolicy: Always   
 
 api:
   image: philiphabib/api-microservice:latest        # <-- your real image
   port: 8000
   replicas: 1
+  tag: "latest"
+  pullPolicy: Always
     
