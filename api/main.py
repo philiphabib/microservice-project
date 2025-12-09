@@ -15,9 +15,9 @@ app.add_middleware(
 def read_root():
     return {"message": "Hello from API Microservice!"}
 
-@app.get("/api/api")
+@app.get("/api/user")
 def read_api_api():
-    return {"message": "Hello from API Microservice!"}
+    return {"message": "Single user goes here!"}
 
 @app.get("/api/users")
 def read_users():
