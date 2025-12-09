@@ -18,7 +18,7 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       # -----------------------------
@@ -26,22 +26,22 @@ jobs:
       # -----------------------------
       - name: Build API Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/api:latest ./api
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api:latest ./api
 
       - name: Push API Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/api:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api:latest
 
       # -----------------------------
       # Build & Push Frontend Image
       # -----------------------------
       - name: Build Frontend Docker Image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/frontend:latest ./frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest ./frontend
 
       - name: Push Frontend Image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/frontend:latest
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend:latest
 
       # -----------------------------
       # Set up SSH key to EC2
