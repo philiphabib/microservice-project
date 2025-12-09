@@ -19,7 +19,6 @@ jobs:
       # Generate image tag from commit SHA
       # -----------------------------
       - name: Set Image Tag
-        id: vars
         run: echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
 
       # -----------------------------
@@ -36,22 +35,22 @@ jobs:
       # -----------------------------
       - name: Build API
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG} ./api
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${{ env.TAG }} ./api
 
       - name: Push API
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${{ env.TAG }}
 
       # -----------------------------
       # Build + Push Frontend
       # -----------------------------
       - name: Build Frontend
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG} ./frontend
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${{ env.TAG }} ./frontend
 
       - name: Push Frontend
         run: |
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${{ env.TAG }}
 
       # -----------------------------
       # Install SSH client
@@ -74,13 +73,15 @@ jobs:
       # -----------------------------
       - name: Deploy via Helm on EC2
         run: |
-          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << 'EOF'
+          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << EOF
             set -e
             cd ~/microservice-project
             git fetch origin
             git reset --hard origin/main
 
             helm upgrade --install microservices ./microservices-chart \
+              --set api.image=${{ secrets.DOCKERHUB_USERNAME }}/api-microservice \
               --set api.tag=${TAG} \
+              --set frontend.image=${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice \
               --set frontend.tag=${TAG}
-          EOF
+EOF
