@@ -39,7 +39,7 @@ jobs:
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG} ./api
 
       - name: Push API Image
-      run: |
+        run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG}
 
       # -----------------------------
@@ -74,13 +74,12 @@ jobs:
       # -----------------------------
       - name: Deploy to EC2 via Helm
         run: |
-          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << EOF
+          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << 'EOF'
             set -e
             cd ~/microservice-project
             git fetch origin
             git reset --hard origin/main
 
-            # Update Helm with the new image tags
             helm upgrade --install microservices ./microservices-chart \
               --set api.image.tag=${TAG} \
               --set frontend.image.tag=${TAG}
