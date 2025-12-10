@@ -79,10 +79,7 @@ jobs:
             cd ~/microservice-project
             git fetch origin
             git reset --hard origin/main
-            helm upgrade --install microservices ./microservices-chart
             # Apply new images with tags
-            cd ~/microservice-project//microservices-chart
-            helm upgrade --install microservices . -f values.yaml \
-              --set api.tag=$TAG \
-              --set frontend.tag=$TAG
+            helm uninstall microservices
+            helm upgrade --install microservices ./microservices-chart
           EOF
