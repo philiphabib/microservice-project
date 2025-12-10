@@ -43,12 +43,21 @@ jobs:
 
       - name: Deploy via SSH & Helm
         run: |
-          ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << EOF
-            set -e
-            export TAG=${TAG}
-            cd ~/microservice-project
-            git fetch origin
-            git reset --hard origin/main
-            helm uninstall microservices || true
-            helm upgrade --install microservices ./microservices-chart
-          EOF
+         ssh -T -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 << EOF
+         set -e
+         export TAG=${TAG}
+
+         cd ~/microservice-project
+         git fetch origin
+         git reset --hard origin/main
+
+         helm uninstall microservices --ignore-not-found --wait
+
+         helm upgrade --install microservices ./microservices-chart \
+          --set api.image.tag=\${TAG} \
+          --set frontend.image.tag=\${TAG}
+
+          kubectl get pods -o wide
+          kubectl get svc
+         EOF
+
