@@ -9,14 +9,14 @@ domains:
 frontend:
   image: philiphabib/frontend-microservice   # <-- your real image
   port: 80
-  replicas: 4
+  replicas: 2
   tag: "latest"
   pullPolicy: Always   
 
 api:
   image: philiphabib/api-microservice        # <-- your real image
   port: 8000
-  replicas: 3
+  replicas: 2
   tag: "latest"
   pullPolicy: Always
     
