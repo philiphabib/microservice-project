@@ -53,9 +53,7 @@ jobs:
 
          helm uninstall microservices --ignore-not-found --wait
 
-         helm upgrade --install microservices ./microservices-chart \
-          --set api.image.tag=\${TAG} \
-          --set frontend.image.tag=\${TAG}
+         helm upgrade --install microservices ./microservices-chart
 
           kubectl get pods -o wide
           kubectl get svc
