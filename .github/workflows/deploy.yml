@@ -76,7 +76,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/github_ec2 ubuntu@34.226.99.222 TAG=${TAG} << EOF
             set -e
-            cd ~/microservice-project
+            cd ~/microservice-project/microservices-chart
             git fetch origin
             git reset --hard origin/main
 
