@@ -21,15 +21,29 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build & Push API
-        run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG} ./api
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG}
+     # - name: Build & Push API
+     #   run: |
+     #    docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG} ./api
+      #    docker push ${{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${TAG}
 
-      - name: Build & Push Frontend
+      #- name: Build & Push Frontend
+       # run: |
+        #  docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG} ./frontend
+         # docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG}
+         
+      - name: Build & Push API Image
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG} ./frontend
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${TAG}
+          docker build -t {{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest ./api
+          docker tag {{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest {{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${{ github.sha }}
+          docker push {{ secrets.DOCKERHUB_USERNAME }}/api-microservice:latest
+          docker push {{ secrets.DOCKERHUB_USERNAME }}/api-microservice:${{ github.sha }}
+
+      - name: Build & Push Frontend Image
+        run: |
+          docker build -t {{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest ./frontend
+          docker tag {{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest {{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${{ github.sha }}
+          docker push {{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:latest
+          docker push {{ secrets.DOCKERHUB_USERNAME }}/frontend-microservice:${{ github.sha }}     
 
       - name: Install SSH client
         run: sudo apt-get update && sudo apt-get install -y openssh-client
